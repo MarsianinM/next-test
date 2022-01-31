@@ -1,31 +1,48 @@
-import { Injectable } from '@nestjs/common';
-import { UserService } from '../user/user.service';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from "bcrypt";
+import { UserService } from 'src/user/user.service';
+import { TokenService } from 'src/token/token.service';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
+import { SignOptions } from 'jsonwebtoken';
+import { CreateUserTokenDto } from 'src/token/dto/create-user-token.dto';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private usersService: UserService,
-        private jwtService: JwtService
-    ) {}
+        private readonly jwtService: JwtService,
+        private readonly userService: UserService,
+        private readonly tokenService: TokenService,
+    ) { }
 
-    async validateUser(userEmail: string, password: string): Promise<any> {
-        const user = await this.usersService.findOne(userEmail);
-        const saltRound = 10;
-        const salt = await bcrypt.genSalt(saltRound);
-        const hash = await bcrypt.hash(password, salt);
-        if (user && user.password === hash) {
-            const { password, ...result } = user;
-            return result;
-        }
-        return null;
+    signUp(createUserDto: CreateUserDto) {
+
     }
 
-    async login(user: any) {
-        const payload = { username: user.username, email: user.email, sub: user.userId };
-        return {
-            access_token: this.jwtService.sign(payload),
-        };
+    signIn(email, password) {
+
+    }
+
+    private async generateToken(data, options?: SignOptions) : Promise<string>{
+        return this.jwtService.sign(data, options);
+    }
+
+    private async verifyToken(token): Promise<any> {
+        try {
+            const data = this.jwtService.verify(token);
+            const tokenExists = await this.tokenService.exists(data._id, token);
+
+            if (tokenExists) {
+                return data;
+            }
+            throw new UnauthorizedException();
+        } catch (error) {
+            throw new UnauthorizedException();
+        }
+    }
+
+    private async saveToken(createUserTokenDto: CreateUserTokenDto) {
+        const userToken = await this.tokenService.create(createUserTokenDto);
+
+        return userToken;
     }
 }
