@@ -9,16 +9,14 @@ export class TokenService {
 
     async create(createUserTokenDto: CreateUserTokenDto): Promise<IUserToken> {
         const userToken = new this.tokenModel(createUserTokenDto);
-        return await userToken.save()
+        return await userToken.save();
     }
 
-    async delete(uId: string, token: string): Promise<{ ok?: number, n?: number }> {
-        // @ts-ignore
-        return await this.tokenModel.deleteOne({ uId, token })
+    async delete(uId: string, token: string): Promise<object> {
+        return await this.tokenModel.deleteOne({ uId, token });
     }
 
-    async deleteAll(uId: string): Promise<{ ok?: number, n?: number }> {
-        // @ts-ignore
+    async deleteAll(uId: string): Promise<object> {
         return await this.tokenModel.deleteMany({ uId });
     }
 

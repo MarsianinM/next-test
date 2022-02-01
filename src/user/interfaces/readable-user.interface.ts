@@ -1,7 +1,6 @@
-import { Document } from 'mongoose';
 import { IAddress } from './address.interface';
 
-export interface IUser extends Document {
+export interface IReadableUser {
     readonly email: string;
     status: string;
     readonly avatar: string;
@@ -11,8 +10,7 @@ export interface IUser extends Document {
     readonly gender: string;
     readonly address: IAddress;
     readonly profession: string;
-    readonly searchField: string;
     readonly phone: string;
     readonly roles: string[];
-    readonly password: string;
+    accessToken?: string;
 }
